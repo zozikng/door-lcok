@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: dock-lock
+  profiles:
+    active: dev

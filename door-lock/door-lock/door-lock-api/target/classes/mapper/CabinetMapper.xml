@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzk.dockLock.mapper.CabinetMapper">
+
+    <resultMap type="com.zzk.dockLock.pojo.Cabinet" id="BaseResultMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="cabinetId" column="cabinet_id"/>
+        <result property="cabinetName" column="cabinet_name"/>
+        <result property="stationId" column="station_id"/>
+    </resultMap>
+
+    <!--<resultMap id="stationIdMap" type="com.zzk.entity.Station" extends="CabinetMap">-->
+    <!--    <association property="id" column="id" javaType="com.zzk.entity.Station" select="findStationId"></association>-->
+    <!--</resultMap>-->
+
+    <!--<select id="findStationId" resultType="com.zzk.entity.Station">-->
+    <!--    SELECT-->
+	<!--	   *-->
+    <!--    FROM-->
+    <!--        z_station-->
+    <!--    WHERE-->
+    <!--    station_ip = #{ip}-->
+    <!--</select>-->
+
+
+    <!--查询站下的们数量-->
+    <select id="selectCountByIp"  resultType="integer">
+       SELECT
+            COUNT(*)
+        FROM
+            z_cabinet
+        WHERE
+            station_id = (
+            SELECT
+                id
+            FROM
+                z_station
+            WHERE
+            station_ip = #{ip}
+            )
+    </select>
+    <select id="selectCabinetByIp" resultType="com.zzk.dockLock.pojo.Cabinet">
+         SELECT
+            *
+        FROM
+            z_cabinet
+        WHERE
+            station_id = (
+            SELECT
+                id
+            FROM
+                z_station
+            WHERE
+            station_ip = #{ip}
+            )
+    </select>
+
+
+</mapper>
+

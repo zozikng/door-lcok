@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzk.dockLock.mapper.RoleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zzk.dockLock.pojo.Role">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="name_zh" property="nameZh" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, name_zh
+    </sql>
+
+    <!--根据用户id查询用户角色-->
+    <select id="getRoles" resultType="com.zzk.dockLock.pojo.Role">
+        SELECT
+            r.id,
+            r.`name`,
+            r.name_zh
+        FROM
+            z_role AS r
+            LEFT JOIN z_user_role AS ur ON r.id = ur.role_id
+        WHERE
+            ur.user_id =#{id}
+    </select>
+
+</mapper>

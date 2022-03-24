@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzk.dockLock.mapper.MenuRoleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zzk.dockLock.pojo.MenuRole">
+        <id column="id" property="id" />
+        <result column="menu_id" property="menuId" />
+        <result column="role_id" property="roleId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, menu_id, role_id
+    </sql>
+    <!--更新角色菜单-->
+    <insert id="insertRecord">
+       INSERT INTO z_menu_role(role_id,menu_id) VALUES  
+       <foreach collection="mids" item="mid" separator=",">
+           (#{rid},#{mid})
+       </foreach>
+    </insert>
+
+</mapper>

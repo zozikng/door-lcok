@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzk.dockLock.mapper.SysUserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zzk.dockLock.pojo.SysUser">
+        <id column="id" property="id" />
+        <result column="username" property="username" />
+        <result column="password" property="password" />
+        <result column="nickname" property="nickname" />
+        <result column="avatar" property="avatar" />
+        <result column="enabled" property="enabled" />
+        <result column="gender" property="gender" />
+    </resultMap>
+
+    <resultMap id="UserWithRole" type="com.zzk.dockLock.pojo.SysUser" extends="BaseResultMap">
+        <collection property="roles" ofType="com.zzk.dockLock.pojo.Role">
+            <id property="id" column="rid"/>
+            <result column="rname" property="name"/>
+            <result column="rnameZh" property="nameZh"/>
+        </collection>
+
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, username, password, nickname, avatar, enabled, gender
+    </sql>
+    <!--获取所有用户（可以有关键字）-->
+    <select id="getAllUsers" resultMap="UserWithRole">
+        SELECT
+        DISTINCT
+            u.id,
+            u.username,
+            u.nickname,
+            u.avatar,
+            u.enabled,
+            u.gender,
+            r.id AS rid,
+            r.NAME AS rname,
+            r.name_zh AS rnameZh
+        FROM
+            z_sys_user u
+            LEFT JOIN z_user_role ur ON u.id = ur.user_id
+            LEFT JOIN z_role r ON r.id = ur.role_id
+        WHERE
+            u.id != #{id}
+            <if test="null!=keyWords and ''!=keyWords">
+                AND u.nickname LIKE CONCAT( '%', #{keyWords}, '%' )
+            </if>
+
+        ORDER BY
+            u.id
+    </select>
+    <!--分页查询所有的用户-->
+    <select id="getAllUsersPage" resultMap="UserWithRole">
+        SELECT
+        DISTINCT
+        u.id,
+        u.username,
+        u.nickname,
+        u.avatar,
+        u.enabled,
+        u.gender,
+        r.id AS rid,
+        r.NAME AS rname,
+        r.name_zh AS rnameZh
+        FROM
+        z_sys_user u
+        LEFT JOIN z_user_role ur ON u.id = ur.user_id
+        LEFT JOIN z_role r ON r.id = ur.role_id
+        WHERE
+        u.id != 1
+        <if test="null!=keyWords and ''!=keyWords">
+            AND u.nickname LIKE CONCAT( '%', #{keyWords}, '%' )
+        </if>
+
+        ORDER BY
+        u.id
+    </select>
+
+</mapper>

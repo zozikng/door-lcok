@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzk.dockLock.mapper.MenuMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zzk.dockLock.pojo.Menu">
+        <id column="id" property="id" />
+        <result column="url" property="url" />
+        <result column="path" property="path" />
+        <result column="component" property="component" />
+        <result column="name" property="name" />
+        <result column="require_auth" property="requireAuth" />
+        <result column="parent_id" property="parentId" />
+        <result column="enabled" property="enabled" />
+        <result column="icon_cls" property="iconCls"/>
+    </resultMap>
+
+    <!--子查询-->
+    <resultMap id="Menus" type="com.zzk.dockLock.pojo.Menu" extends="BaseResultMap">
+        <collection property="children" ofType="com.zzk.dockLock.pojo.Menu">
+            <id column="id2" property="id" />
+            <result column="url2" property="url" />
+            <result column="path2" property="path" />
+            <result column="component2" property="component" />
+            <result column="name2" property="name" />
+            <result column="require_auth2" property="requireAuth" />
+            <result column="parent_id2" property="parentId" />
+            <result column="enabled2" property="enabled" />
+            <result column="icon_cls2" property="iconCls"/>
+        </collection>
+    </resultMap>
+
+    <!--对于Role表的相关子查询结果集-->
+    <resultMap id="MenusWithRole" type="com.zzk.dockLock.pojo.Menu" extends="BaseResultMap">
+        <collection property="roles" ofType="com.zzk.dockLock.pojo.Role">
+            <id column="rid" property="id"/>
+            <result column="rname" property="name"/>
+            <result column="rnameZh" property="nameZh"/>
+        </collection>
+    </resultMap>
+    <!--获取所有菜单-->
+    <resultMap id="MenusWithChildren" type="com.zzk.dockLock.pojo.Menu" extends="BaseResultMap">
+        <id column="id1" property="id"/>
+        <result column="name1" property="name"/>
+        <collection property="children" ofType="com.zzk.dockLock.pojo.Menu">
+            <id column="id2" property="id"/>
+            <result column="name2" property="name"/>
+            <collection property="children" ofType="com.zzk.dockLock.pojo.Menu">
+                <id column="id3" property="id"/>
+                <result column="name3" property="name"/>
+                <collection property="children" ofType="com.zzk.dockLock.pojo.Menu">
+                    <id column="id4" property="id"/>
+                    <result column="name4" property="name"/>
+                </collection>
+            </collection>
+        </collection>
+    </resultMap>
+    <!--获取所有菜单信息信息-->
+    <resultMap id="MenuWithChildrenDetail" type="com.zzk.dockLock.pojo.Menu" extends="BaseResultMap">
+        <id column="id1" property="id"/>
+        <result column="name1" property="name"/>
+        <result column="url1" property="url"/>
+        <result column="path1" property="path"/>
+        <result column="component1" property="component"/>
+        <result column="require_auth1" property="requireAuth"/>
+        <result column="parent_id1" property="parentId"/>
+        <result column="enabled1" property="enabled"/>
+        <result column="icon_cls1" property="iconCls"/>
+        <collection property="children" ofType="com.zzk.dockLock.pojo.Menu">
+            <id column="id2" property="id"/>
+            <result column="name2" property="name"/>
+            <result column="url2" property="url"/>
+            <result column="path2" property="path"/>
+            <result column="component2" property="component"/>
+            <result column="require_auth2" property="requireAuth"/>
+            <result column="parent_id2" property="parentId"/>
+            <result column="enabled2" property="enabled"/>
+            <result column="icon_cls2" property="iconCls"/>
+            <collection property="children" ofType="com.zzk.dockLock.pojo.Menu">
+                <id column="id3" property="id"/>
+                <result column="name3" property="name"/>
+                <result column="url3" property="url"/>
+                <result column="path3" property="path"/>
+                <result column="component3" property="component"/>
+                <result column="require_auth3" property="requireAuth"/>
+                <result column="parent_id3" property="parentId"/>
+                <result column="enabled3" property="enabled"/>
+                <result column="icon_cls3" property="iconCls"/>
+                <collection property="children" ofType="com.zzk.dockLock.pojo.Menu">
+                    <id column="id4" property="id"/>
+                    <result column="name4" property="name"/>
+                    <result column="url4" property="url"/>
+                    <result column="path4" property="path"/>
+                    <result column="component4" property="component"/>
+                    <result column="require_auth4" property="requireAuth"/>
+                    <result column="parent_id4" property="parentId"/>
+                    <result column="enabled4" property="enabled"/>
+                    <result column="icon_cls4" property="iconCls"/>
+                </collection>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, url, path, component, name, require_auth, parent_id, enabled
+    </sql>
+    <!--通过用户id查询菜单-->
+    <select id="getMenuByUserId" resultMap="Menus">
+        SELECT DISTINCT
+            m1.*,
+            m2.id AS id2,
+            m2.url AS url2,
+            m2.path AS path2,
+            m2.component AS component2,
+            m2.`name` AS name2,
+            m2.require_auth AS require_auth2,
+            m2.parent_id AS parent_id2,
+            m2.enabled AS enabled2,
+            m2.icon_cls as icon_cls2
+        FROM
+            z_menu m1,
+            z_menu m2,
+						z_menu m3,
+            z_user_role ur,
+            z_menu_role mr
+        WHERE
+            m1.id = m2.parent_id
+            AND m3.id = mr.menu_id
+			AND m2.id = m3.parent_id
+            AND mr.role_id = ur.role_id
+            AND ur.user_id = #{id}
+            AND m1.parent_id=1
+            AND m2.enabled = TRUE
+			AND m3.enabled = TRUE
+            ORDER BY m1.id;
+    </select>
+    <!--根据角色获取菜单列表-->
+    <select id="getMenuWithRole" resultMap="MenusWithRole">
+        SELECT
+            m.*,
+            r.id AS rid,
+            r.`name` AS rname,
+            r.name_zh AS rnameZh
+        FROM
+            z_menu m,
+            z_menu_role mr,
+            z_role r
+        WHERE
+            m.id = mr.menu_id
+            AND r.id = mr.role_id
+            AND m.require_auth=1
+        ORDER BY
+            m.id
+    </select>
+
+    <!--获取所有菜单-->
+    <select id="getAllMenus" resultMap="MenusWithChildren">
+        SELECT
+            m1.id AS id1,
+            m1.NAME AS name1,
+            m2.id AS id2,
+            m2.NAME AS name2,
+            m3.id AS id3,
+            m3.NAME AS name3,
+            m4.id AS id4,
+            m4.NAME AS name4
+        FROM
+            z_menu m1,
+            z_menu m2,
+            z_menu m3,
+            z_menu m4
+        WHERE
+             m1.id = m2.parent_id
+            AND m2.id = m3.parent_id
+			AND m3.id = m4.parent_id
+            AND m4.enabled = TRUE
+            AND m4.require_auth=1
+    </select>
+    <!--获取所有菜单详细信息-->
+    <select id="getAllMenusDetail" resultMap="MenuWithChildrenDetail">
+        SELECT
+            m1.id AS id1,
+            m1.NAME AS name1,
+            m1.url AS url1,
+            m1.path AS path1,
+            m1.component AS component1,
+            m1.require_auth AS require_auth1,
+            m1.parent_id AS parent_id1,
+            m1.enabled AS enabled1,
+            m1.icon_cls as icon_cls1,
+            m2.id AS id2,
+            m2.NAME AS name2,
+            m2.url AS url2,
+            m2.path AS path2,
+            m2.component AS component2,
+            m2.require_auth AS require_auth2,
+            m2.parent_id AS parent_id2,
+            m2.enabled AS enabled2,
+            m2.icon_cls as icon_cls2,
+            m3.id AS id3,
+            m3.NAME AS name3,
+            m3.url AS url3,
+            m3.path AS path3,
+            m3.component AS component3,
+            m3.require_auth AS require_auth3,
+            m3.parent_id AS parent_id3,
+            m3.enabled AS enabled3,
+            m3.icon_cls AS icon_cls3,
+            m4.id AS id4,
+            m4.NAME AS name4,
+            m4.url AS url4,
+            m4.path AS path4,
+            m4.component AS component4,
+            m4.require_auth AS require_auth4,
+            m4.parent_id AS parent_id4,
+            m4.enabled AS enabled4,
+            m4.icon_cls as icon_cls4
+        FROM
+            z_menu m1,
+            z_menu m2,
+            z_menu m3,
+            z_menu m4
+        WHERE
+            m1.id = m2.parent_id
+            AND m2.id = m3.parent_id
+			AND m3.id = m4.parent_id
+            AND m4.enabled = TRUE
+
+    </select>
+
+</mapper>

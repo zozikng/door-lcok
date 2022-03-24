@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzk.dockLock.mapper.StationMapper">
+
+    <resultMap id="BaseResultMap" type="com.zzk.dockLock.pojo.Station">
+        <id property="id" column="id"/>
+        <result property="stationName" column="station_name"/>
+        <result property="stationIp" column="station_ip"/>
+        <result property="stationAddress" column="station_address"/>
+        <result property="stationStatus" column="station_status"/>
+    </resultMap>
+    
+    <resultMap id="StationCabinet" type="com.zzk.dockLock.pojo.Station" extends="BaseResultMap">
+        <collection property="cabinets" ofType="com.zzk.dockLock.pojo.Cabinet">
+            <id column="cabid" property="id"/>
+            <result column="devid" property="cabinetId"/>
+            <result column="cabname" property="cabinetName"/>
+            <result column="cabstId" property="stationId"/>
+        </collection>
+    </resultMap>
+
+    <select id="findCabinetListByStationIp"  resultMap="StationCabinet">
+
+        SELECT
+            st.*,
+            cab.id cabid,
+            cab.cabinet_id devid,
+            cab.cabinet_name cabname,
+            cab.station_id cabstId 
+        FROM
+            z_cabinet cab,
+            z_station st 
+        WHERE
+            cab.station_id = st.id 
+            AND st.station_ip = #{stationIp}
+            AND st.station_status = 1
+
+    </select>
+</mapper>
